@@ -71,6 +71,37 @@
     -fx-max-width: 220px;
 }
 
+/* Title Styling */
+.title-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Comic Sans MS";
+    -fx-text-alignment: center;
+}
+
+/* Row Styling */
+.animal-row {
+    -fx-background-color: #EAEAEA;
+    -fx-padding: 10px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-color: #B0B0B0;
+    -fx-border-width: 2px;
+}
+
+/* Accept Button */
+.accept-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 5px 10px;
+    -fx-border-radius: 5px;
+}
+
+.accept-button:hover {
+    -fx-background-color: #388E3C;
+}
+
 /* Title, Funds, and Rating Text */
 .title-text, .funds-text, .rating-text {
     -fx-font-size: 18px;
@@ -245,5 +276,19 @@
 
 .dialog-button:hover {
     -fx-background-color: #21867A;
+}
+
+.small-menu-button {
+    -fx-font-size: 14px;
+    -fx-padding: 5px 10px;
+    -fx-background-color: #F4A261;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+}
+
+.small-menu-button:hover {
+    -fx-background-color: #E76F51;
 }
 
