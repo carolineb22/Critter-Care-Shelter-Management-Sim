@@ -1,0 +1,249 @@
+/* Set background color */
+.root {
+    -fx-background-color: lightblue;
+}
+
+/* Styling for main text (introduction) */
+.textbox {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 20px;
+    -fx-text-alignment: center;
+    -fx-fill: black;
+}
+
+/* Subtitle details */
+.details {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 18px;
+    -fx-text-alignment: center;
+    -fx-fill: black;
+}
+
+/* Text field input */
+.textField {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 16px;
+    -fx-pref-width: 300px;
+    -fx-max-width: 300px;
+}
+
+/* Submit button */
+.submitButton {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 18px;
+    -fx-background-color: #D3D3D3;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-padding: 5px 15px;
+}
+
+/* ==============================
+   Shelter Name Box (Title Box)
+   ============================== */
+
+.title-container {
+    -fx-background-color: white;  /* White background */
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-padding: 5 12;
+    -fx-border-color: #ccc;
+    -fx-min-width: 300px;
+    -fx-max-width: 400px;
+    -fx-pref-height: 35px;
+    -fx-alignment: center-left;
+    -fx-spacing: 8;
+}
+
+/* ==============================
+   Funds & Rating Boxes (Now White)
+   ============================== */
+
+.info-box {
+    -fx-background-color: white; /* White background */
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-padding: 10 15;
+    -fx-min-height: 40px;
+    -fx-max-height: 50px;
+    -fx-border-color: #ccc;
+    -fx-alignment: center;
+    -fx-pref-width: 180px;
+    -fx-max-width: 220px;
+}
+
+/* Title, Funds, and Rating Text */
+.title-text, .funds-text, .rating-text {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Comic Sans MS";
+}
+
+/* Edit Button (Pencil Icon) */
+.edit-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 5;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+}
+
+.edit-button:hover {
+    -fx-opacity: 0.6;
+}
+
+/* ==============================
+   Main Buttons (Upgrades, Staff, etc.)
+   ============================== */
+
+.main-button {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 20px;
+    -fx-background-color: #F4A261;
+    -fx-border-color: black;
+    -fx-border-width: 3px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 15px 10px;
+    -fx-min-width: 450px;
+    -fx-max-width: 450px;
+}
+
+.main-button:hover {
+    -fx-background-color: #E76F51;
+}
+
+/* ==============================
+   Animal Buttons (VACANT Slots)
+   ============================== */
+
+.animal-button {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 14px;
+    -fx-background-color: #E9C46A;
+    -fx-border-color: black;
+    -fx-border-width: 3px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 8px;
+}
+
+.animal-button:hover {
+    -fx-background-color: #F4A261;
+}
+
+/* ==============================
+   Main Menu Styling
+   ============================== */
+
+.menu {
+    -fx-alignment: center;
+    -fx-spacing: 15;
+}
+
+.menu-button {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 20px;
+    -fx-background-color: #2A9D8F;
+    -fx-border-color: black;
+    -fx-border-width: 4px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 12px 25px;
+}
+
+.menu-button:hover {
+    -fx-background-color: #21867A;
+}
+
+/* ==============================
+   Warning Window
+   ============================== */
+
+.warning-window {
+    -fx-background-color: #FF6F61;
+    -fx-padding: 30px;
+}
+
+.warning-text {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 16px;
+    -fx-fill: white;
+    -fx-font-weight: bold;
+}
+
+.secondary-text {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 14px;
+    -fx-fill: white;
+}
+
+/* ==============================
+   Main Menu Titles
+   ============================== */
+
+.title {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-fill: #264653;
+}
+
+.subtitle {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 24px;
+    -fx-text-alignment: center;
+    -fx-fill: #264653;
+}
+
+/* Ensure the entire scene fills the screen */
+.grid-pane {
+    -fx-pref-height: 100%;
+    -fx-pref-width: 100%;
+    -fx-alignment: center;
+}
+
+/* Rename Dialog Styling */
+.rename-dialog {
+    -fx-background-color: white;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 20px;
+    -fx-alignment: center;
+}
+
+/* Dialog Text */
+.dialog-text {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 16px;
+    -fx-text-alignment: center;
+    -fx-fill: black;
+}
+
+/* Dialog Text Field */
+.dialog-textfield {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 14px;
+    -fx-pref-width: 250px;
+    -fx-padding: 5px;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+}
+
+/* Dialog Buttons */
+.dialog-button {
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-size: 16px;
+    -fx-background-color: #2A9D8F;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 8px 15px;
+}
+
+.dialog-button:hover {
+    -fx-background-color: #21867A;
+}
+
