@@ -56,17 +56,7 @@ public class MainMenu extends Application {
 
         // Button Actions
         continueButton.setOnAction(e -> checkForSaveFiles());
-        newGameButton.setOnAction(e -> {
-            newGameWarning();
-            try {
-                File file = new File("AcceptedAnimals.txt");
-                if (file.exists()) {
-                    file.delete();  // This deletes the file
-                }
-            } catch (Exception f) {
-                f.printStackTrace();
-            }
-        });
+        newGameButton.setOnAction(e -> newGameWarning());
 
         VBox menuLayout = new VBox(10, title, subtitle, continueButton, newGameButton);
         menuLayout.setAlignment(Pos.CENTER); // Ensures all elements are centered
@@ -108,13 +98,26 @@ public class MainMenu extends Application {
         warning2.getStyleClass().add("secondary-text");
 
         newGameButton.setOnAction(e -> {
+            File file = new File("AcceptedAnimals.txt"); // Change filename as needed
+
+            if (file.exists()) { // Check if the file exists
+                if (file.delete()) { // Attempt to delete
+                    System.out.println("File deleted successfully.");
+                } else {
+                    System.out.println("Failed to delete the file.");
+                }
+            } else {
+                System.out.println("File does not exist.");
+            }
             mainGame.mainScene(primaryStage, "Pawsville Animal Shelter");
             secondaryStage.close();
             mainGame.resetGameData(); // Clear saved data
             mainGame.resetAvailableSlots();
             primaryStage.setScene(mainGame.getMainGameScene()); // Start fresh
         });
-        cancelButton.setOnAction(e -> secondaryStage.close());
+        cancelButton.setOnAction(e -> {
+            secondaryStage.close();
+        });
 
         VBox layout = new VBox(15, warning, warning2, newGameButton, cancelButton);
         layout.getStyleClass().add("warning-window");
@@ -130,7 +133,7 @@ public class MainMenu extends Application {
 
     void checkForSaveFiles() {
         File f = new File("CritterCareSave.txt");
-        if (f.isFile() && !f.isDirectory()) {
+        if (f.isFile() && !f.isDirectory()) { //if files exist
             try (BufferedReader br = new BufferedReader(new FileReader(f))) {
                 String shelterName = br.readLine();
                 System.out.println("Loaded shelter name: " + shelterName);
@@ -138,7 +141,7 @@ public class MainMenu extends Application {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
+        } else { //if files don't exist
             mainGame.mainScene(primaryStage, "Pawsville Animal Shelter");
         }
     }

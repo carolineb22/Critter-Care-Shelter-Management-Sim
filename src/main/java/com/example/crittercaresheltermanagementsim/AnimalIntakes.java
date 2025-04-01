@@ -180,9 +180,20 @@ public class AnimalIntakes {
             if (mainGame.hasAvailableSlots()) {
                 Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability);
 
-                // Check if the animal is already accepted before adding
-                if (!acceptedAnimals.containsKey(animal.getName())) {
-                    acceptedAnimals.put(animal.getName(), animal);  // Store the animal in memory
+                // Generate a unique entry string
+                String newAnimalEntry = String.join(",",
+                        animal.getName(),
+                        animal.getType(),
+                        animal.getImageFile(),
+                        String.valueOf(animal.getHappiness()),
+                        String.valueOf(animal.getAppearance()),
+                        String.valueOf(animal.getObedience()),
+                        String.valueOf(animal.getAdoptability())
+                );
+
+                // Check if the exact entry exists
+                if (!acceptedAnimals.containsValue(newAnimalEntry)) {
+                    acceptedAnimals.put(animal.getName(), animal);  // Store in memory
 
                     mainGame.addAnimalToShelter(animal);  // Add to shelter UI
 
@@ -190,14 +201,16 @@ public class AnimalIntakes {
                     updateAnimalList();  // Update display
 
                     saveAnimalToFile(animal); // Save info to file
+                    mainGame.saveAnimalCount(mainGame.availableSlots);
                 } else {
-                    System.out.println("This animal has already been accepted.");
+                    System.out.println("This exact animal entry has already been accepted.");
                 }
             } else {
                 System.out.println("No available slots");
                 slotsFullWarning();
             }
         });
+
 
         return animalEntry;
     }
@@ -260,6 +273,7 @@ public class AnimalIntakes {
             if (!isAnimalInFile(animal)) {
                 bw.write(animalData);
                 bw.newLine(); // New line after each animal
+                mainGame.availableSlots--;
             }
             mainGame.removeDuplicatesAndSave();
         } catch (IOException e) {
@@ -267,17 +281,24 @@ public class AnimalIntakes {
         }
     }
 
-    // Method to check if an animal is already in the file
     public boolean isAnimalInFile(Animal animal) {
         File file = new File("AcceptedAnimals.txt");
         if (!file.exists()) return false;
 
+        // Create the full expected entry string
+        String animalEntry = animal.getName() + "," +
+                animal.getType() + "," +
+                animal.getImageFile() + "," +
+                animal.getHappiness() + "," +
+                animal.getAppearance() + "," +
+                animal.getObedience() + "," +
+                animal.getAdoptability();
+
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] animalData = line.split(",");
-                if (animalData[0].equals(animal.getName())) {
-                    return true; // Animal already in the file
+                if (line.equals(animalEntry)) {
+                    return true; // Exact match found
                 }
             }
         } catch (IOException e) {

@@ -25,13 +25,15 @@ public class MainGame {
     int currentRating = 2;
     int currentFunds = 5000;
     private List<Button> animalButtons = new ArrayList<>();
-    private int availableSlots = 12;
+    int availableSlots = 12;
     Map<String, Animal> acceptedAnimals = new HashMap<>();
 
     public void mainScene(Stage primaryStage, String shelterName) {
         this.primaryStage = primaryStage;
         this.shelterName = shelterName; // Store name in instance variable
 
+
+        availableSlots = loadAnimalCount();
         AnimalIntakes animalIntakes = new AnimalIntakes(this, primaryStage);
 
         gridPane = new GridPane();
@@ -421,5 +423,26 @@ public class MainGame {
             e.printStackTrace();
         }
     }
+
+    int loadAnimalCount() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("animalCount.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                return Integer.parseInt(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 12; // Start at 12 if no file exists
+    }
+
+    void saveAnimalCount(int availableSlots) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("animalCount.txt"))) {
+            writer.write(String.valueOf(availableSlots));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }
