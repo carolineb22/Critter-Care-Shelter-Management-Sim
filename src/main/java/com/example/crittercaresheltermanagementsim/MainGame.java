@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.util.*;
 
+
 public class MainGame {
     private GridPane gridPane;
     private Scene mainGameScene;  // Store the scene reference
@@ -27,6 +28,7 @@ public class MainGame {
     private List<Button> animalButtons = new ArrayList<>();
     private int availableSlots = 12;
     Map<String, Animal> acceptedAnimals = new HashMap<>();
+    AnimalCare animalCare = new AnimalCare();
 
     public void mainScene(Stage primaryStage, String shelterName) {
         this.primaryStage = primaryStage;
@@ -149,6 +151,20 @@ public class MainGame {
                 animalButtons.add(animalButton); // ✅ Store the button in the list
             }
         }
+        for (Button animalButton : animalButtons) {
+            animalButton.setOnAction(e -> {
+                String animalName = animalButton.getText();
+                if (!animalName.equals("VACANT")) {
+                    Animal animal = acceptedAnimals.get(animalName);
+                    if (animal != null) {
+                        animalCare.openAnimalDetailsScene(animal);
+                    }
+                }
+            });
+        }
+
+
+
 
         loadAcceptedAnimals();
 
@@ -324,23 +340,25 @@ public class MainGame {
 
     // Add animal to first available button
     public void addAnimalToShelter(Animal animal) {
-        for (Button button : animalButtons) {
-            if (button.getText().equals("VACANT")) {
-                // Update UI
-                button.setText(animal.getName());
-                button.setGraphic(getAnimalImage(animal.getImageFile()));
+            for (Button button : animalButtons) {
+                if (button.getText().equals("VACANT")) {
+                    // Update UI
+                    button.setText(animal.getName());
+                    button.setGraphic(getAnimalImage(animal.getImageFile()));
 
-                // Save immediately to file with full animal data (name, type, image, stats)
-                saveAcceptedAnimals();
+                    availableSlots --;
+                    // Save immediately to file with full animal data (name, type, image, stats)
+                    acceptedAnimals.put(animal.getName(), animal);
+                    saveAcceptedAnimals();
 
-                return;
+                    return;
+                }
             }
-        }
     }
 
 
     // Get random image for the animal type
-    private ImageView getAnimalImage(String imageFile) {
+    ImageView getAnimalImage(String imageFile) {
         String imagePath = "/images/" + imageFile;
 
         InputStream imageStream = getClass().getResourceAsStream(imagePath);

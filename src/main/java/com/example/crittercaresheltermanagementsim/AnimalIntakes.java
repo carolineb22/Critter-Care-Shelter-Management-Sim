@@ -144,6 +144,7 @@ public class AnimalIntakes {
         int appearance = random.nextInt(max - min + 1) + min;
         int obedience = random.nextInt(max - min + 1) + min;
         int adoptability = (happiness + appearance + obedience) / 3;
+        String description = "";
 
         String age = random.nextInt(12) + 1 + " months";
 
@@ -177,25 +178,19 @@ public class AnimalIntakes {
         animalEntry.setAlignment(Pos.CENTER_LEFT);
 
         acceptButton.setOnAction(e -> {
-            if (mainGame.hasAvailableSlots()) {
+            if (mainGame.hasAvailableSlots() == true) {
                 Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability);
+                acceptedAnimals.put(animal.getName(), animal);  // Store the animal in memory
 
-                // Check if the animal is already accepted before adding
-                if (!acceptedAnimals.containsKey(animal.getName())) {
-                    acceptedAnimals.put(animal.getName(), animal);  // Store the animal in memory
+                mainGame.addAnimalToShelter(animal);  // Add to shelter UI
 
-                    mainGame.addAnimalToShelter(animal);  // Add to shelter UI
+                animalEntries.remove(animalEntry);  // Remove from intake list
+                updateAnimalList();  // Update display
 
-                    animalEntries.remove(animalEntry);  // Remove from intake list
-                    updateAnimalList();  // Update display
-
-                    saveAnimalToFile(animal); // Save info to file
-                } else {
-                    System.out.println("This animal has already been accepted.");
-                }
+                saveAnimalToFile(animal);  // Save info to file
             } else {
-                System.out.println("No available slots");
-                slotsFullWarning();
+                System.out.println("No available slots");  // Debugging output
+                slotsFullWarning();  // Show warning if slots are full
             }
         });
 
@@ -203,6 +198,7 @@ public class AnimalIntakes {
     }
 
     void slotsFullWarning() {
+        System.out.println("Warning: Shelter slots are full!");  // Debugging output
         Stage tertiaryStage = new Stage();
         tertiaryStage.setTitle("SHELTER SLOTS FULL");
 
@@ -213,7 +209,7 @@ public class AnimalIntakes {
         tertiaryStage.setResizable(false);
 
         Text warning = new Text("Shelter slots are full!");
-        Text warning2 = new Text("Upgrade the shelter or adopt out animal to free up spots!");
+        Text warning2 = new Text("Upgrade the shelter or adopt out animals to free up spots!");
 
         warning.setWrappingWidth(350);
         warning2.setWrappingWidth(250);
