@@ -11,9 +11,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class AnimalIntakes {
     private final MainGame mainGame;
@@ -21,7 +19,7 @@ public class AnimalIntakes {
     private List<HBox> animalEntries = new ArrayList<>();
     private long lastUpdateTime = 0;
     VBox animalList = new VBox(10);
-    private List<String> acceptedAnimals = new ArrayList<>();
+    Map<String, Animal> acceptedAnimals = new HashMap<>();
     private List<String> animalNames;
     static String animalData;
 
@@ -39,7 +37,6 @@ public class AnimalIntakes {
         root.setStyle("-fx-background-color: #A7D3E8;");
 
         // Create the components for the Animal Intake Scene
-        // For example, create and add labels, buttons, etc.
         Text title = new Text("Animal Intakes");
         title.setFont(Font.font("Comic Sans MS", 30));
         VBox titleBox = new VBox(title);
@@ -113,57 +110,93 @@ public class AnimalIntakes {
 
     private HBox createAnimalEntry() {
         Random random = new Random();
-        String name = getRandomName(); // Get a random name from the list
+        String name = getRandomName();
         String[] animalType = {"Dog", "Bunny", "Cat"};
         String[] statuses = {"Terrible", "Poor", "Average", "Good", "Great"};
 
         String type = animalType[random.nextInt(animalType.length)];
         String status = statuses[random.nextInt(statuses.length)];
-        String age = random.nextInt(12) + " months";
+
+        // Stat Ranges
+        int min, max;
+        switch (status) {
+            case "Terrible":
+                min = 1; max = 2;
+                break;
+            case "Poor":
+                min = 2; max = 4;
+                break;
+            case "Average":
+                min = 4; max = 6;
+                break;
+            case "Good":
+                min = 5; max = 7;
+                break;
+            case "Great":
+                min = 6; max = 9;
+                break;
+            default:
+                min = 4; max = 6; // Default case for safety
+        }
+
+        // Generate stats
+        int happiness = random.nextInt(max - min + 1) + min;
+        int appearance = random.nextInt(max - min + 1) + min;
+        int obedience = random.nextInt(max - min + 1) + min;
+        int adoptability = (happiness + appearance + obedience) / 3;
+
+        String age = random.nextInt(12) + 1 + " months";
 
         // Generate a random image based on type
         int imageNum = random.nextInt(3) + 1; // Assuming you have 3 images per type
-        String imageFile = type.toLowerCase() + imageNum + ".png"; // Example: "cat3.png"
+        String imageFile = type.toLowerCase() + imageNum + ".png";
 
         Text nameText = new Text(name);
-        Text breedText = new Text("Breed: " + type);
+        Text typeText = new Text("Type: " + type);
         Text statusText = new Text("Status: " + status);
-        switch (status) {
-            case "Terrible":
-                statusText.setFill(javafx.scene.paint.Color.RED);
-                break;
-            case "Poor":
-                statusText.setFill(javafx.scene.paint.Color.ORANGE);
-                break;
-            case "Good":
-                statusText.setFill(javafx.scene.paint.Color.YELLOW);
-                break;
-            case "Great":
-                statusText.setFill(javafx.scene.paint.Color.GREEN);
-                break;
-        }
         Text ageText = new Text("Age: " + age);
+        Text happinessText = new Text("Happiness: " + happiness);
+        Text appearanceText = new Text("Appearance: " + appearance);
+        Text obedienceText = new Text("Obedience: " + obedience);
+        Text adoptabilityText = new Text("Adoptability: " + adoptability);
+
+        // Set color based on status
+        switch (status) {
+            case "Terrible": statusText.setFill(javafx.scene.paint.Color.RED); break;
+            case "Poor": statusText.setFill(javafx.scene.paint.Color.ORANGE); break;
+            case "Good": statusText.setFill(javafx.scene.paint.Color.YELLOW); break;
+            case "Great": statusText.setFill(javafx.scene.paint.Color.GREEN); break;
+        }
 
         Button acceptButton = new Button("Accept");
         acceptButton.setFont(Font.font("Comic Sans MS", 14));
 
-        HBox animalEntry = new HBox(15, nameText, breedText, statusText, ageText, acceptButton);
+        HBox animalEntry = new HBox(15, nameText, typeText, statusText, ageText,
+                happinessText, appearanceText, obedienceText, adoptabilityText, acceptButton);
         animalEntry.setPadding(new Insets(10));
         animalEntry.setAlignment(Pos.CENTER_LEFT);
 
         acceptButton.setOnAction(e -> {
-            if (mainGame.hasAvailableSlots())
-            {
-                acceptedAnimals.add(animalData);  // Store data in memory
-                mainGame.addAnimalToShelter(name, type, imageFile);  // Add to shelter UI
-                animalEntries.remove(animalEntry);  // Remove from intake list
-                updateAnimalList();  // Update animal intake display
-            }
-            else {
+            if (mainGame.hasAvailableSlots()) {
+                Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability);
+
+                // Check if the animal is already accepted before adding
+                if (!acceptedAnimals.containsKey(animal.getName())) {
+                    acceptedAnimals.put(animal.getName(), animal);  // Store the animal in memory
+
+                    mainGame.addAnimalToShelter(animal);  // Add to shelter UI
+
+                    animalEntries.remove(animalEntry);  // Remove from intake list
+                    updateAnimalList();  // Update display
+
+                    saveAnimalToFile(animal); // Save info to file
+                } else {
+                    System.out.println("This animal has already been accepted.");
+                }
+            } else {
                 System.out.println("No available slots");
                 slotsFullWarning();
             }
-
         });
 
         return animalEntry;
@@ -210,15 +243,47 @@ public class AnimalIntakes {
         animalList.getChildren().addAll(animalEntries);
     }
 
-    // Save accepted animals to file
-    void saveAnimalToFile(String name, String type, String imageFile) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("AcceptedAnimals.txt", true))) {
-            writer.write(name + "," + type + "," + imageFile);
-            writer.newLine();
+    public void saveAnimalToFile(Animal animal) {
+        File file = new File("AcceptedAnimals.txt");
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {  // 'true' to append to the file
+            // Write animal details only if it's not already in the file
+            String animalData = animal.getName() + "," +
+                    animal.getType() + "," +
+                    animal.getImageFile() + "," +
+                    animal.getHappiness() + "," +
+                    animal.getAppearance() + "," +
+                    animal.getObedience() + "," +
+                    animal.getAdoptability();
+
+            // Only write the animal if it's not already in the file
+            if (!isAnimalInFile(animal)) {
+                bw.write(animalData);
+                bw.newLine(); // New line after each animal
+            }
+            mainGame.removeDuplicatesAndSave();
         } catch (IOException e) {
-            System.err.println("Error saving accepted animal: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
+    // Method to check if an animal is already in the file
+    public boolean isAnimalInFile(Animal animal) {
+        File file = new File("AcceptedAnimals.txt");
+        if (!file.exists()) return false;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] animalData = line.split(",");
+                if (animalData[0].equals(animal.getName())) {
+                    return true; // Animal already in the file
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
 }

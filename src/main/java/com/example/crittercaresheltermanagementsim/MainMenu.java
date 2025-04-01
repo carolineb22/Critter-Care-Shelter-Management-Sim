@@ -56,7 +56,17 @@ public class MainMenu extends Application {
 
         // Button Actions
         continueButton.setOnAction(e -> checkForSaveFiles());
-        newGameButton.setOnAction(e -> newGameWarning());
+        newGameButton.setOnAction(e -> {
+            newGameWarning();
+            try {
+                File file = new File("AcceptedAnimals.txt");
+                if (file.exists()) {
+                    file.delete();  // This deletes the file
+                }
+            } catch (Exception f) {
+                f.printStackTrace();
+            }
+        });
 
         VBox menuLayout = new VBox(10, title, subtitle, continueButton, newGameButton);
         menuLayout.setAlignment(Pos.CENTER); // Ensures all elements are centered

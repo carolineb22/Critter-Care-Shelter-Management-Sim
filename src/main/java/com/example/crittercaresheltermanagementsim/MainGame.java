@@ -25,8 +25,8 @@ public class MainGame {
     int currentRating = 2;
     int currentFunds = 5000;
     private List<Button> animalButtons = new ArrayList<>();
-    private List<String> acceptedAnimals = new ArrayList<>();
     private int availableSlots = 12;
+    Map<String, Animal> acceptedAnimals = new HashMap<>();
 
     public void mainScene(Stage primaryStage, String shelterName) {
         this.primaryStage = primaryStage;
@@ -227,37 +227,49 @@ public class MainGame {
         return this.mainGameScene;
     }
 
-    public void addAcceptedAnimal(String name, String type, String imageFile) {
-        // Add animal to the UI
-        for (Button button : animalButtons) {
-            if (button.getText().equals("VACANT")) {
-                button.setText(name);
-                button.setGraphic(getAnimalImage(imageFile));
-                break; // Stop after updating one slot
-            }
-        }
+    public void addAcceptedAnimal(Animal animal) {
+
+        // Add animal to the acceptedAnimals map
+        acceptedAnimals.put(animal.getName(), animal);
 
         // Save animal to the "AcceptedAnimals.txt" file
-        saveAcceptedAnimals();
+        saveAcceptedAnimals(); // Save updated animal data immediately after adding it
     }
 
+    // Save accepted animals to a file with stats
     private void saveAcceptedAnimals() {
-        List<String> allAnimals = new ArrayList<>();
-        for (Button button : animalButtons) {
-            if (!button.getText().equals("VACANT")) {
-                String animalName = button.getText();
-                String imageFile = getAnimalImageFile(button); // Assuming you have a method to get the image file name
-            }
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("AcceptedAnimals.txt"))) {
-            for (String animal : allAnimals) {
-                writer.write(animal);
-                writer.newLine();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("AcceptedAnimals.txt", true))) { // 'true' enables append mode
+            // Loop through accepted animals and write each one on a new line
+            for (Map.Entry<String, Animal> entry : acceptedAnimals.entrySet()) {
+                Animal animal = entry.getValue();
+                String line = animal.getName() + "," + animal.getType() + "," + animal.getImageFile() + "," +
+                        animal.getHappiness() + "," + animal.getAppearance() + "," + animal.getObedience() + "," + animal.getAdoptability();
+                writer.write(line);
+                writer.newLine(); // Ensure each animal's data is written on a new line
             }
         } catch (IOException e) {
             System.err.println("Error saving accepted animals: " + e.getMessage());
         }
+    }
+
+    // Retrieve a specific stat for an animal
+    public int getAnimalStat(String animalName, String statType) {
+        Animal animal = acceptedAnimals.get(animalName);
+        if (animal != null) {
+            switch (statType) {
+                case "happiness":
+                    return animal.getHappiness();
+                case "appearance":
+                    return animal.getAppearance();
+                case "obedience":
+                    return animal.getObedience();
+                case "adoptability":
+                    return animal.getAdoptability();
+                default:
+                    return -1; // Stat not found
+            }
+        }
+        return -1; // Animal not found
     }
 
     public void loadAcceptedAnimals() {
@@ -266,57 +278,63 @@ public class MainGame {
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
-            List<String[]> savedAnimals = new ArrayList<>();
+
+            // Clear the acceptedAnimals map to avoid duplication
+            acceptedAnimals.clear();
+
+            // Clear the animal buttons first to reset
+            for (Button button : animalButtons) {
+                button.setText("VACANT");
+                button.setGraphic(null);
+            }
 
             while ((line = br.readLine()) != null) {
                 String[] animalData = line.split(",");
-                if (animalData.length == 5) { // Ensure all fields exist
-                    savedAnimals.add(animalData);
+                if (animalData.length == 7) {
+                    String name = animalData[0];
+                    String type = animalData[1];
+                    String imageFile = animalData[2];
+                    int happiness = Integer.parseInt(animalData[3]);
+                    int appearance = Integer.parseInt(animalData[4]);
+                    int obedience = Integer.parseInt(animalData[5]);
+                    int adoptability = Integer.parseInt(animalData[6]);
+
+                    // Create a new Animal object
+                    Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability);
+
+                    // Add the animal to the acceptedAnimals map if not already there
+                    if (!acceptedAnimals.containsKey(name)) {
+                        acceptedAnimals.put(name, animal);
+
+                        // Now set the animal on the first vacant button
+                        for (Button button : animalButtons) {
+                            if (button.getText().equals("VACANT")) {
+                                button.setText(animal.getName());
+                                button.setGraphic(getAnimalImage(animal.getImageFile()));
+                                break; // Stop after updating one button
+                            }
+                        }
+                    }
                 }
             }
-
-            // Load saved animals into the shelter buttons
-            for (int i = 0; i < savedAnimals.size(); i++) {
-                if (i < animalButtons.size()) {
-                    String name = savedAnimals.get(i)[0];
-                    String imageFile = savedAnimals.get(i)[4];
-
-                    animalButtons.get(i).setText(name);
-                    animalButtons.get(i).setGraphic(getAnimalImage(imageFile));
-                }
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
-    private String getAnimalImageFile(Button button) {
-        // Add your logic here to return the correct image filename based on button's graphic.
-        // You can adjust this as per your image naming logic.
-        return "dog1.png"; // Example, you'll need to implement dynamic file retrieval.
-    }
-
     // Add animal to first available button
-    public void addAnimalToShelter(String name, String type, String imageFile) {
-        if (hasAvailableSlots()) {
-            availableSlots--;
+    public void addAnimalToShelter(Animal animal) {
+        for (Button button : animalButtons) {
+            if (button.getText().equals("VACANT")) {
+                // Update UI
+                button.setText(animal.getName());
+                button.setGraphic(getAnimalImage(animal.getImageFile()));
 
-            for (Button button : animalButtons) {
-                if (button.getText().equals("VACANT")) {
-                    // Update UI
-                    button.setText(name);
-                    button.setGraphic(getAnimalImage(imageFile));
+                // Save immediately to file with full animal data (name, type, image, stats)
+                saveAcceptedAnimals();
 
-                    // Save immediately to file
-                    animalIntakes.saveAnimalToFile(name, type, imageFile);
-
-                    return;
-                }
+                return;
             }
-        } else {
-            System.out.println("Can't add animal to shelter.");
         }
     }
 
@@ -373,6 +391,35 @@ public class MainGame {
 
     public void resetAvailableSlots() {
         availableSlots = 12; // Reset to full slots if needed
+    }
+
+    public void removeDuplicatesAndSave() {
+        // Step 1: Read the file and store the animals
+        Set<String> animalEntries = new HashSet<>();  // To track unique animal entries (exact match)
+        List<String> uniqueAnimals = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("acceptedAnimals.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Step 2: Check if the exact animal entry already exists
+                if (!animalEntries.contains(line)) {
+                    animalEntries.add(line);  // Add the entire line to the set to track uniqueness
+                    uniqueAnimals.add(line);  // Add the entire line (animal info) to the unique list
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Step 3: Write the unique animals back to the file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("acceptedAnimals.txt"))) {
+            for (String uniqueAnimal : uniqueAnimals) {
+                writer.write(uniqueAnimal);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
