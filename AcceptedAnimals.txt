@@ -1,2 +1,12 @@
-Duke,Cat,Great,6 months
-Bella,Beagle,Good,5 months
+Bella,Bunny,bunny1.png
+Winnie,Dog,dog3.png
+Maple,Dog,dog1.png
+Dexter,Cat,cat3.png
+Ruby,Dog,dog2.png
+Coco,Dog,dog3.png
+Oscar,Bunny,bunny1.png
+Charlie,Bunny,bunny2.png
+Luna,Dog,dog1.png
+Winnie,Bunny,bunny1.png
+Rosie,Cat,cat3.png
+Duke,Dog,dog3.png

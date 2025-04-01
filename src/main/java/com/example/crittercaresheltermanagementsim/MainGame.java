@@ -13,9 +13,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class MainGame {
     private GridPane gridPane;
@@ -23,15 +21,16 @@ public class MainGame {
     private Stage primaryStage;   // Store the primaryStage reference
     private String shelterName;
     private Text titleText;
-    AnimalIntakes animalIntakes;
+    AnimalIntakes animalIntakes = new AnimalIntakes(this, primaryStage);
     int currentRating = 2;
     int currentFunds = 5000;
     private List<Button> animalButtons = new ArrayList<>();
+    private List<String> acceptedAnimals = new ArrayList<>();
+    private int availableSlots = 12;
 
     public void mainScene(Stage primaryStage, String shelterName) {
         this.primaryStage = primaryStage;
         this.shelterName = shelterName; // Store name in instance variable
-        loadAcceptedAnimals();
 
         AnimalIntakes animalIntakes = new AnimalIntakes(this, primaryStage);
 
@@ -151,6 +150,8 @@ public class MainGame {
             }
         }
 
+        loadAcceptedAnimals();
+
         this.mainGameScene = scene;  // Store scene reference
         // Set scene properties
         primaryStage.setScene(scene);
@@ -226,63 +227,152 @@ public class MainGame {
         return this.mainGameScene;
     }
 
-    public void addAcceptedAnimal(String name) {
-        gridPane = new GridPane();
-        for (Node node : gridPane.getChildren()) {
-            if (node instanceof Button) {
-                Button animalButton = (Button) node;
-                if (animalButton.getText().equals("VACANT")) {
-                    animalButton.setText(name);
-                    return; // Stop after updating one slot
-                }
+    public void addAcceptedAnimal(String name, String type, String imageFile) {
+        // Add animal to the UI
+        for (Button button : animalButtons) {
+            if (button.getText().equals("VACANT")) {
+                button.setText(name);
+                button.setGraphic(getAnimalImage(imageFile));
+                break; // Stop after updating one slot
             }
+        }
+
+        // Save animal to the "AcceptedAnimals.txt" file
+        saveAcceptedAnimals();
+    }
+
+    private void saveAcceptedAnimals() {
+        List<String> allAnimals = new ArrayList<>();
+        for (Button button : animalButtons) {
+            if (!button.getText().equals("VACANT")) {
+                String animalName = button.getText();
+                String imageFile = getAnimalImageFile(button); // Assuming you have a method to get the image file name
+            }
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("AcceptedAnimals.txt"))) {
+            for (String animal : allAnimals) {
+                writer.write(animal);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error saving accepted animals: " + e.getMessage());
         }
     }
 
-    private void loadAcceptedAnimals() {
+    public void loadAcceptedAnimals() {
         File file = new File("AcceptedAnimals.txt");
         if (!file.exists()) return;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length > 0) {
-                    addAcceptedAnimal(data[0]); // Use only the name
+            List<String[]> savedAnimals = new ArrayList<>();
+
+            while ((line = br.readLine()) != null) {
+                String[] animalData = line.split(",");
+                if (animalData.length == 5) { // Ensure all fields exist
+                    savedAnimals.add(animalData);
                 }
             }
+
+            // Load saved animals into the shelter buttons
+            for (int i = 0; i < savedAnimals.size(); i++) {
+                if (i < animalButtons.size()) {
+                    String name = savedAnimals.get(i)[0];
+                    String imageFile = savedAnimals.get(i)[4];
+
+                    animalButtons.get(i).setText(name);
+                    animalButtons.get(i).setGraphic(getAnimalImage(imageFile));
+                }
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+
+    private String getAnimalImageFile(Button button) {
+        // Add your logic here to return the correct image filename based on button's graphic.
+        // You can adjust this as per your image naming logic.
+        return "dog1.png"; // Example, you'll need to implement dynamic file retrieval.
+    }
+
     // Add animal to first available button
-    public void addAnimalToShelter(String name, String type) {
-        for (Button button : animalButtons) {
-            if (button.getText().equals("VACANT")) {
-                button.setText(name); // Set the button text to the animal's name
-                button.setGraphic(getAnimalImage(type)); // Set the button graphic (image)
-                return;
+    public void addAnimalToShelter(String name, String type, String imageFile) {
+        if (hasAvailableSlots()) {
+            availableSlots--;
+
+            for (Button button : animalButtons) {
+                if (button.getText().equals("VACANT")) {
+                    // Update UI
+                    button.setText(name);
+                    button.setGraphic(getAnimalImage(imageFile));
+
+                    // Save immediately to file
+                    animalIntakes.saveAnimalToFile(name, type, imageFile);
+
+                    return;
+                }
             }
+        } else {
+            System.out.println("Can't add animal to shelter.");
         }
     }
 
+
     // Get random image for the animal type
-    private ImageView getAnimalImage(String type) {
-        Random random = new Random();
-        int imgNum = random.nextInt(3) + 1; // Picks 1, 2, or 3
-        String imagePath = "/" + type.toLowerCase() + imgNum + ".png"; // Example: "/dog2.png"
+    private ImageView getAnimalImage(String imageFile) {
+        String imagePath = "/images/" + imageFile;
 
-        // Load the image (Ensure images are in 'resources' folder)
-        Image image = new Image(getClass().getResourceAsStream(imagePath));
+        InputStream imageStream = getClass().getResourceAsStream(imagePath);
+        if (imageStream == null) {
+            System.err.println("Image not found: " + imagePath);
+            return new ImageView();
+        }
+
+        Image image = new Image(imageStream);
         ImageView imageView = new ImageView(image);
-
-        // Resize image for button
         imageView.setFitWidth(50);
         imageView.setFitHeight(50);
 
         return imageView;
     }
 
+    public void resetGameData() {
+        File file = new File("AcceptedAnimals.txt");
+        File file2 = new File("CritterCareSave.txt");
+
+        // Delete file1 if it exists
+        if (file.exists()) {
+            if (file.delete()) {
+                System.out.println("Game reset: AcceptedAnimals.txt deleted.");
+            } else {
+                System.err.println("Failed to delete AcceptedAnimals.txt.");
+            }
+        }
+        // Delete file2 if it exists
+        if (file2.exists()) {
+            if (file2.delete()) {
+                System.out.println("Game reset: AcceptedAnimals.txt deleted.");
+            } else {
+                System.err.println("Failed to delete AcceptedAnimals.txt.");
+            }
+        }
+
+        // Reset animal buttons
+        for (Button button : animalButtons) {
+            button.setText("VACANT");
+            button.setGraphic(null);
+        }
+    }
+
+    public boolean hasAvailableSlots() {
+        return availableSlots > 0;
+    }
+
+    public void resetAvailableSlots() {
+        availableSlots = 12; // Reset to full slots if needed
+    }
 
 }

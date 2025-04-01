@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class MainMenu extends Application {
-    Namer namer = new Namer();
     MainGame mainGame = new MainGame();
     public Stage primaryStage = new Stage();
 
@@ -99,8 +98,11 @@ public class MainMenu extends Application {
         warning2.getStyleClass().add("secondary-text");
 
         newGameButton.setOnAction(e -> {
-            namer.nameShelter(primaryStage);
+            mainGame.mainScene(primaryStage, "Pawsville Animal Shelter");
             secondaryStage.close();
+            mainGame.resetGameData(); // Clear saved data
+            mainGame.resetAvailableSlots();
+            primaryStage.setScene(mainGame.getMainGameScene()); // Start fresh
         });
         cancelButton.setOnAction(e -> secondaryStage.close());
 
@@ -127,7 +129,9 @@ public class MainMenu extends Application {
                 e.printStackTrace();
             }
         } else {
-            namer.nameShelter(primaryStage);
+            mainGame.mainScene(primaryStage, "Pawsville Animal Shelter");
         }
     }
+
+
 }
