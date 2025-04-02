@@ -6,9 +6,7 @@ Critter Care: Shelter Management Sim is a JavaFX-based simulation game where pla
 
 Animal Intake System – Accept animals with randomly generated attributes.
 
-Shelter Management – Track and manage shelter resources.
-
-Animal Interaction – View detailed animal stats and make decisions to care for them.
+Animal Interaction – View animals individually and customize their names.
 
 Save & Load System – Persist shelter and animal data.
 
