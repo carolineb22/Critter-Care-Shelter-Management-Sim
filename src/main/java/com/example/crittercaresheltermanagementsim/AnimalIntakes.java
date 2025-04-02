@@ -21,7 +21,6 @@ public class AnimalIntakes {
     VBox animalList = new VBox(10);
     Map<String, Animal> acceptedAnimals = new HashMap<>();
     private List<String> animalNames;
-    static String animalData;
 
     public AnimalIntakes(MainGame mainGame, Stage primaryStage) {
         this.mainGame = mainGame;
@@ -145,7 +144,7 @@ public class AnimalIntakes {
         int obedience = random.nextInt(max - min + 1) + min;
         int adoptability = (happiness + appearance + obedience) / 3;
 
-        String age = random.nextInt(12) + 1 + " months";
+        String age = (random.nextBoolean() ? (random.nextInt(11) + 1 + " months") : (random.nextInt(12) + 1 + " years"));
 
         // Generate a random image based on type
         int imageNum = random.nextInt(3) + 1; // Assuming you have 3 images per type
@@ -178,7 +177,7 @@ public class AnimalIntakes {
 
         acceptButton.setOnAction(e -> {
             if (mainGame.hasAvailableSlots()) {
-                Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability);
+                Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability, age);
 
                 // Generate a unique entry string
                 String newAnimalEntry = String.join(",",
@@ -188,7 +187,8 @@ public class AnimalIntakes {
                         String.valueOf(animal.getHappiness()),
                         String.valueOf(animal.getAppearance()),
                         String.valueOf(animal.getObedience()),
-                        String.valueOf(animal.getAdoptability())
+                        String.valueOf(animal.getAdoptability()),
+                        String.valueOf(animal.getAge())
                 );
 
                 // Check if the exact entry exists
@@ -267,7 +267,8 @@ public class AnimalIntakes {
                     animal.getHappiness() + "," +
                     animal.getAppearance() + "," +
                     animal.getObedience() + "," +
-                    animal.getAdoptability();
+                    animal.getAdoptability() + "," +
+                    animal.getAge();
 
             // Only write the animal if it's not already in the file
             if (!isAnimalInFile(animal)) {
@@ -292,7 +293,8 @@ public class AnimalIntakes {
                 animal.getHappiness() + "," +
                 animal.getAppearance() + "," +
                 animal.getObedience() + "," +
-                animal.getAdoptability();
+                animal.getAdoptability() + "," +
+                animal.getAge();
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;

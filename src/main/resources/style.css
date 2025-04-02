@@ -1,3 +1,23 @@
+/* Set all text to comic sans */
+* {
+    -fx-font-family: "Comic Sans MS";
+}
+
+.stat-label {
+    -fx-font-size: 18px;  /* Slightly bigger */
+    -fx-alignment: center; /* Align center */
+    -fx-text-alignment: center; /* Ensure text is centered */
+    -fx-font-weight: bold; /* Make it stand out */
+}
+
+.description-area {
+    -fx-pref-height: 150px;  /* Increase height */
+    -fx-padding: 10px;  /* Add some padding */
+    -fx-font-size: 18px;  /* Slightly bigger */
+    -fx-background-color: #E9C46A;
+    -fx-background-radius: 10px;
+}
+
 /* Set background color */
 .root {
     -fx-background-color: lightblue;

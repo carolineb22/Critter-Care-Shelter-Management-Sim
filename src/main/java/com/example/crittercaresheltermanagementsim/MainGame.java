@@ -2,7 +2,6 @@ package com.example.crittercaresheltermanagementsim;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -16,12 +15,9 @@ import java.io.*;
 import java.util.*;
 
 public class MainGame {
-    private GridPane gridPane;
     private Scene mainGameScene;  // Store the scene reference
-    private Stage primaryStage;   // Store the primaryStage reference
     private String shelterName;
     private Text titleText;
-    AnimalIntakes animalIntakes = new AnimalIntakes(this, primaryStage);
     int currentRating = 2;
     int currentFunds = 5000;
     private List<Button> animalButtons = new ArrayList<>();
@@ -29,14 +25,14 @@ public class MainGame {
     Map<String, Animal> acceptedAnimals = new HashMap<>();
 
     public void mainScene(Stage primaryStage, String shelterName) {
-        this.primaryStage = primaryStage;
+        // Store the primaryStage reference
         this.shelterName = shelterName; // Store name in instance variable
 
 
         availableSlots = loadAnimalCount();
         AnimalIntakes animalIntakes = new AnimalIntakes(this, primaryStage);
 
-        gridPane = new GridPane();
+        GridPane gridPane = new GridPane();
         Scene scene = new Scene(gridPane, 800, 600);
 
         gridPane.setHgap(15);
@@ -142,15 +138,36 @@ public class MainGame {
         animalIntakeButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         // Generate vacant animal slots
+        int buttonCount = 1; // Counter for button names
+
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 2; col++) {
-                Button animalButton = new Button("VACANT"); // Create a new button for each slot
+                Button animalButton = new Button("VACANT");
+                animalButton.setId("animalButton" + buttonCount); // Assign a unique ID
                 animalButton.getStyleClass().add("animal-button");
                 animalButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
                 gridPane.add(animalButton, 5 + col, row);
                 animalButtons.add(animalButton); // ✅ Store the button in the list
+
+                int currentButtonIndex = buttonCount; // Store index for use in lambda
+                animalButton.setOnAction(e -> {
+                    System.out.println("Clicked: " + animalButton.getId()); // Debugging output
+
+                    // Adjust the index by subtracting 1 to fix the off-by-one issue
+                    int adjustedIndex = currentButtonIndex - 1;
+
+                    // Get the animal based on the adjusted index
+                    Animal selectedAnimal = AnimalCare.getAnimalFromSaveFileByIndex(adjustedIndex);
+                    Scene animalDetailsScene = AnimalCare.createAnimalDetailsScene(primaryStage, primaryStage.getScene(), selectedAnimal);
+                    primaryStage.setScene(animalDetailsScene);
+                });
+
+                buttonCount++; // Increment button count
             }
         }
+
+
 
         loadAcceptedAnimals();
 
@@ -245,7 +262,7 @@ public class MainGame {
             for (Map.Entry<String, Animal> entry : acceptedAnimals.entrySet()) {
                 Animal animal = entry.getValue();
                 String line = animal.getName() + "," + animal.getType() + "," + animal.getImageFile() + "," +
-                        animal.getHappiness() + "," + animal.getAppearance() + "," + animal.getObedience() + "," + animal.getAdoptability();
+                        animal.getHappiness() + "," + animal.getAppearance() + "," + animal.getObedience() + "," + animal.getAdoptability() + "," + animal.getAge();
                 writer.write(line);
                 writer.newLine(); // Ensure each animal's data is written on a new line
             }
@@ -292,7 +309,7 @@ public class MainGame {
 
             while ((line = br.readLine()) != null) {
                 String[] animalData = line.split(",");
-                if (animalData.length == 7) {
+                if (animalData.length == 8) {
                     String name = animalData[0];
                     String type = animalData[1];
                     String imageFile = animalData[2];
@@ -300,9 +317,10 @@ public class MainGame {
                     int appearance = Integer.parseInt(animalData[4]);
                     int obedience = Integer.parseInt(animalData[5]);
                     int adoptability = Integer.parseInt(animalData[6]);
+                    String age = animalData[7];
 
                     // Create a new Animal object
-                    Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability);
+                    Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability, age);
 
                     // Add the animal to the acceptedAnimals map if not already there
                     if (!acceptedAnimals.containsKey(name)) {
@@ -443,6 +461,5 @@ public class MainGame {
             e.printStackTrace();
         }
     }
-
 
 }

@@ -8,8 +8,9 @@ class Animal {
     int appearance;
     int obedience;
     int adoptability;
+    String age;
 
-    public Animal(String name, String type, String imageFile, int happiness, int appearance, int obedience, int adoptability) {
+    public Animal(String name, String type, String imageFile, int happiness, int appearance, int obedience, int adoptability, String age) {
         this.name = name;
         this.type = type;
         this.imageFile = imageFile;
@@ -17,6 +18,7 @@ class Animal {
         this.appearance = appearance;
         this.obedience = obedience;
         this.adoptability = adoptability;
+        this.age = age;
     }
 
     // Optional: Override toString() for easy saving to file
@@ -52,5 +54,14 @@ class Animal {
     public int getAdoptability() {
         return adoptability;
     }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setName(String newName) {
+    }
+
+    public void setDescription(String newType) {}
 }
 
