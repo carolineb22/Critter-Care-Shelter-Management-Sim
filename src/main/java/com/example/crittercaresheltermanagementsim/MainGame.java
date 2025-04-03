@@ -159,6 +159,11 @@ public class MainGame {
 
                     // Get the animal based on the adjusted index
                     Animal selectedAnimal = AnimalCare.getAnimalFromSaveFileByIndex(adjustedIndex);
+                    if (selectedAnimal == null) {
+                        System.out.println("Animal at index " + adjustedIndex + " is null!");
+                    } else {
+                        System.out.println("Selected animal: " + selectedAnimal.getName());
+                    }
                     Scene animalDetailsScene = AnimalCare.createAnimalDetailsScene(primaryStage, primaryStage.getScene(), selectedAnimal);
                     primaryStage.setScene(animalDetailsScene);
                 });
@@ -309,7 +314,7 @@ public class MainGame {
 
             while ((line = br.readLine()) != null) {
                 String[] animalData = line.split(",");
-                if (animalData.length == 8) {
+                if (animalData.length == 14) {
                     String name = animalData[0];
                     String type = animalData[1];
                     String imageFile = animalData[2];
@@ -318,9 +323,18 @@ public class MainGame {
                     int obedience = Integer.parseInt(animalData[5]);
                     int adoptability = Integer.parseInt(animalData[6]);
                     String age = animalData[7];
+                    boolean fedStatus = Boolean.parseBoolean(animalData[8]);
+                    boolean vaccinatedStatus = Boolean.parseBoolean(animalData[9]);
+                    String healthStatus = animalData[10];
+                    String playStatus = animalData[11];
+                    String groomStatus = animalData[12];
+                    String trainingStatus = animalData[13];
 
                     // Create a new Animal object
-                    Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability, age);
+                    Animal animal = new Animal(
+                            name, type, imageFile, happiness, appearance, obedience, adoptability, age,
+                            fedStatus, vaccinatedStatus, healthStatus, playStatus, groomStatus, trainingStatus
+                    );
 
                     // Add the animal to the acceptedAnimals map if not already there
                     if (!acceptedAnimals.containsKey(name)) {

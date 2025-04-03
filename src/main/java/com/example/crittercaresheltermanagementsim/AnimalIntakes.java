@@ -144,6 +144,15 @@ public class AnimalIntakes {
         int obedience = random.nextInt(max - min + 1) + min;
         int adoptability = (happiness + appearance + obedience) / 3;
 
+
+        String healthStatus = statuses[random.nextInt(statuses.length)];
+        String playStatus = statuses[random.nextInt(statuses.length)];
+        String groomStatus = statuses[random.nextInt(statuses.length)];
+        String trainingStatus = statuses[random.nextInt(statuses.length)];
+
+        boolean fedStatus = false;
+        boolean vaccinatedStatus = false;
+
         String age = (random.nextBoolean() ? (random.nextInt(11) + 1 + " months") : (random.nextInt(12) + 1 + " years"));
 
         // Generate a random image based on type
@@ -177,7 +186,7 @@ public class AnimalIntakes {
 
         acceptButton.setOnAction(e -> {
             if (mainGame.hasAvailableSlots()) {
-                Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability, age);
+                Animal animal = new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability, age, fedStatus, vaccinatedStatus, healthStatus, playStatus, groomStatus, trainingStatus);
 
                 // Generate a unique entry string
                 String newAnimalEntry = String.join(",",
@@ -188,7 +197,13 @@ public class AnimalIntakes {
                         String.valueOf(animal.getAppearance()),
                         String.valueOf(animal.getObedience()),
                         String.valueOf(animal.getAdoptability()),
-                        String.valueOf(animal.getAge())
+                        String.valueOf(animal.getAge()),  // Ensure this is a string
+                        animal.getHealthStatus(),
+                        animal.getPlayStatus(),
+                        animal.getGroomStatus(),
+                        animal.getTrainingStatus(),
+                        String.valueOf(animal.isFedStatus()),       // Convert boolean to string
+                        String.valueOf(animal.isVaccinatedStatus()) // Convert boolean to string
                 );
 
                 // Check if the exact entry exists
@@ -268,7 +283,13 @@ public class AnimalIntakes {
                     animal.getAppearance() + "," +
                     animal.getObedience() + "," +
                     animal.getAdoptability() + "," +
-                    animal.getAge();
+                    animal.getAge() + "," +
+                    String.valueOf(animal.isFedStatus())  + "," +
+                    String.valueOf(animal.isVaccinatedStatus()) + "," +
+                    animal.getHealthStatus() + "," +
+                    animal.getPlayStatus() + "," +
+                    animal.getGroomStatus() + "," +
+                    animal.getTrainingStatus();
 
             // Only write the animal if it's not already in the file
             if (!isAnimalInFile(animal)) {

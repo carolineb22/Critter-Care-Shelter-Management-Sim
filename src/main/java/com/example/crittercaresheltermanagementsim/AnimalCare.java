@@ -87,7 +87,7 @@ public class AnimalCare {
         root.setLeft(leftBox);
 
         // Right section (Description)
-        VBox rightBox = new VBox(10);
+        VBox rightBox = new VBox(20);
         rightBox.setPadding(new Insets(10));
 
         Label descLabel = new Label("Description");
@@ -115,7 +115,6 @@ public class AnimalCare {
         HBox.setMargin(descriptionArea, new Insets(0, 0, 0, 150)); // Move it slightly to the right
 
         HBox descBox = new HBox(5, descriptionArea);
-        rightBox.getChildren().addAll(descLabel, descBox);
         root.setCenter(rightBox);
 
         // Bottom section (Actions)
@@ -133,8 +132,8 @@ public class AnimalCare {
                 createStatusActionRow("Status: In training", "TRAIN")
         );
 
-        // Instead of placing it at the bottom of the root, you can position it higher in the layout
-        root.setBottom(actionsBox);
+        rightBox.getChildren().addAll(descLabel, descBox, actionsBox);
+        root.setCenter(rightBox);
 
 
         Scene scene = new Scene(root, 800, 600);
@@ -173,13 +172,31 @@ public class AnimalCare {
             while ((line = br.readLine()) != null) {
                 if (currentLine == index) { // When the line matches the index
                     String[] parts = line.split(",");
-                    if (parts.length == 8) {
-                        return new Animal(parts[0], parts[1], parts[2], // Name, Type, Image
-                                Integer.parseInt(parts[3]),  // Happiness
-                                Integer.parseInt(parts[4]),  // Appearance
-                                Integer.parseInt(parts[5]),  // Obedience
-                                Integer.parseInt(parts[6]), // Adoptability
-                                parts[7]); // age
+                    if (parts.length == 14) { // Expecting 14 values now (including new attributes)
+
+                        // Parse the data from the split line
+                        String name = parts[0];
+                        String type = parts[1];
+                        String imageFile = parts[2];
+                        int happiness = Integer.parseInt(parts[3]);
+                        int appearance = Integer.parseInt(parts[4]);
+                        int obedience = Integer.parseInt(parts[5]);
+                        int adoptability = Integer.parseInt(parts[6]);
+                        String age = parts[7];
+                        boolean fedStatus = Boolean.parseBoolean(parts[8]); // Parse as boolean
+                        boolean vaccinatedStatus = Boolean.parseBoolean(parts[9]); // Parse as boolean
+                        String healthStatus = parts[10];
+                        String playStatus = parts[11];
+                        String groomStatus = parts[12];
+                        String trainingStatus = parts[13];
+
+                        System.out.println("Successfully retrieved: " + name + " from file!");
+
+                        return new Animal(name, type, imageFile, happiness, appearance, obedience, adoptability,
+                                age, fedStatus, vaccinatedStatus, healthStatus, playStatus, groomStatus, trainingStatus);
+
+                    } else {
+                        System.out.println("ERROR: Incorrect number of attributes in line: " + line);
                     }
                 }
                 currentLine++; // Increment line number
@@ -187,6 +204,8 @@ public class AnimalCare {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        System.out.println("WARNING: No animal found at index " + index);
         return null; // Return null if no match found
     }
 

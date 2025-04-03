@@ -1,12 +1,5 @@
-Tobi,Dog,dog2.png,1,2,1,1,3 months
-Jasper,Bunny,bunny2.png,7,6,7,6,2 months
-Lily,Bunny,bunny3.png,4,6,5,5,11 months
-Gizmo,Dog,dog1.png,7,7,8,7,7 months
-Hunter,Dog,dog2.png,7,7,6,6,8 months
-Annie,Cat,cat2.png,6,8,6,6,10 months
-Leo,Bunny,bunny1.png,6,4,4,4,12 months
-Maxie,Cat,cat3.png,4,3,4,3,12 months
-Elsa,Dog,dog2.png,2,1,1,1,12 months
-Willow,Cat,cat3.png,6,5,7,6,10 months
-Maggie,Bunny,bunny1.png,4,5,4,4,6 months
-Sampson,Bunny,bunny3.png,7,7,8,7,11 months
+Marley,Bunny,bunny2.png,2,3,1,2,5 months,false,false,Good,Terrible,Great,Terrible
+Mabel,Bunny,bunny3.png,1,2,1,1,8 years,false,false,Terrible,Terrible,Great,Terrible
+Hazel,Bunny,bunny2.png,2,2,2,2,9 years,false,false,Good,Average,Average,Poor
+Tucker,Cat,cat2.png,1,2,2,1,8 months,false,false,Poor,Terrible,Great,Poor
+Tinker,Dog,dog1.png,2,1,4,2,9 years,false,false,Terrible,Great,Average,Good
