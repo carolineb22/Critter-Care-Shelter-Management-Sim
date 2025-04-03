@@ -1,6 +1,7 @@
 package com.example.crittercaresheltermanagementsim;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -37,7 +38,10 @@ public class MainMenu extends Application {
         primaryStage.setHeight(screenHeight);
         primaryStage.setMinWidth(screenWidth);
         primaryStage.setMinHeight(screenHeight);
-        primaryStage.setMaximized(true);
+        Platform.runLater(() -> {
+            primaryStage.setMaximized(false);
+            primaryStage.setMaximized(true);
+        });
 
 
         Text title = new Text("CRITTER CARE");
@@ -68,6 +72,10 @@ public class MainMenu extends Application {
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
 
         primaryStage.setScene(scene);
+        Platform.runLater(() -> {
+            primaryStage.setMaximized(false);
+            primaryStage.setMaximized(true);
+        });
         primaryStage.show();
     }
 
@@ -100,20 +108,24 @@ public class MainMenu extends Application {
         newGameButton.setOnAction(e -> {
             File file = new File("AcceptedAnimals.txt"); // Change filename as needed
 
-            if (file.exists()) { // Check if the file exists
-                if (file.delete()) { // Attempt to delete
-                    System.out.println("File deleted successfully.");
-                } else {
-                    System.out.println("Failed to delete the file.");
+            File file1 = new File("CritterCareSave.txt");
+            if (!file1.exists()) {
+                try {
+                    file1.createNewFile();  // This ensures the file exists before reading it.
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
-            } else {
-                System.out.println("File does not exist.");
             }
+
             mainGame.mainScene(primaryStage, "Pawsville Animal Shelter");
             secondaryStage.close();
             mainGame.resetGameData(); // Clear saved data
             mainGame.resetAvailableSlots();
             primaryStage.setScene(mainGame.getMainGameScene()); // Start fresh
+            Platform.runLater(() -> {
+                primaryStage.setMaximized(false);
+                primaryStage.setMaximized(true);
+            });
         });
         cancelButton.setOnAction(e -> {
             secondaryStage.close();
@@ -128,6 +140,8 @@ public class MainMenu extends Application {
         secondaryScene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
 
         secondaryStage.setScene(secondaryScene);
+
+        GameUtils.ensureSaveFileExists();
         secondaryStage.show();
     }
 

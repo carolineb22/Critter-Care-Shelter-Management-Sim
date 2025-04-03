@@ -1,5 +1,6 @@
 package com.example.crittercaresheltermanagementsim;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -66,7 +67,13 @@ public class AnimalIntakes {
         // Back button to return to the main game scene
         Button backButton = new Button("↩ Back");
         backButton.setFont(Font.font("Comic Sans MS", 14));
-        backButton.setOnAction(e -> primaryStage.setScene(mainGame.getMainGameScene()));
+        backButton.setOnAction(e -> {
+            primaryStage.setScene(mainGame.getMainGameScene());
+            Platform.runLater(() -> {
+                primaryStage.setMaximized(false);
+                primaryStage.setMaximized(true);
+            });
+        });
 
         // Layout for the back button
         HBox backBox = new HBox(backButton);
@@ -81,6 +88,10 @@ public class AnimalIntakes {
         // Create the scene and show it
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
+        Platform.runLater(() -> {
+            primaryStage.setMaximized(false);
+            primaryStage.setMaximized(true);
+        });
         primaryStage.show();
     }
 

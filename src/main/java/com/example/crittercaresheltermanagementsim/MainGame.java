@@ -1,9 +1,13 @@
 package com.example.crittercaresheltermanagementsim;
 
+import javafx.application.Platform;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -23,11 +27,14 @@ public class MainGame {
     private List<Button> animalButtons = new ArrayList<>();
     int availableSlots = 12;
     Map<String, Animal> acceptedAnimals = new HashMap<>();
+    private GameTimeManager gameTimeManager;
+    private int dayCount;
 
     public void mainScene(Stage primaryStage, String shelterName) {
         // Store the primaryStage reference
         this.shelterName = shelterName; // Store name in instance variable
 
+        this.dayCount = loadGameData();
 
         availableSlots = loadAnimalCount();
         AnimalIntakes animalIntakes = new AnimalIntakes(this, primaryStage);
@@ -73,8 +80,20 @@ public class MainGame {
         ImageView pencilIcon = new ImageView(new Image(getClass().getResourceAsStream("/pencil.png")));
         pencilIcon.setFitWidth(20);
         pencilIcon.setFitHeight(20);
+        editButton.setMinSize(20, 20);
+        editButton.setMaxSize(20, 20);
         editButton.setGraphic(pencilIcon);
-        editButton.setOnAction(e -> openRenameDialog());
+        editButton.toFront();
+        editButton.setDisable(false); // Ensure the button is not disabled
+        editButton.setVisible(true); // Ensure the button is visible
+        editButton.setStyle("-fx-background-color: transparent; -fx-border-width: 0;");
+        editButton.setCursor(Cursor.HAND);
+
+        System.out.println("Button visibility: " + editButton.isVisible());
+        editButton.setOnAction(e -> {
+            System.out.println("Edit button clicked!");
+            openRenameDialog();
+        });
 
         // Flexible space to push button to the right
         Region spacer = new Region();
@@ -83,6 +102,16 @@ public class MainGame {
         titleBox.getChildren().addAll(titleText, spacer, editButton);
         gridPane.add(titleBox, 0, 0, 3, 1);
 
+
+        // Create timeLabel and GameTimeManager
+        Label timeLabel = new Label();
+        GameTimeManager gameTimeManager = new GameTimeManager(this, timeLabel);
+
+        // Create the pause button for the time cycle
+        HBox timeBox = gameTimeManager.createPauseButton();
+        GridPane.setColumnIndex(timeBox, 1); // Move it to the second column
+        GridPane.setHalignment(timeBox, HPos.RIGHT); // Align to the right
+        gridPane.getChildren().add(timeBox);
 
         // Funds Box
         VBox fundsBox = new VBox();
@@ -166,6 +195,10 @@ public class MainGame {
                     }
                     Scene animalDetailsScene = AnimalCare.createAnimalDetailsScene(primaryStage, primaryStage.getScene(), selectedAnimal);
                     primaryStage.setScene(animalDetailsScene);
+                    Platform.runLater(() -> {
+                        primaryStage.setMaximized(false);
+                        primaryStage.setMaximized(true);
+                    });
                 });
 
                 buttonCount++; // Increment button count
@@ -179,11 +212,19 @@ public class MainGame {
         this.mainGameScene = scene;  // Store scene reference
         // Set scene properties
         primaryStage.setScene(scene);
+        Platform.runLater(() -> {
+            primaryStage.setMaximized(false);
+            primaryStage.setMaximized(true);
+        });
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
 
-        // Maximize window properly
-        primaryStage.setMaximized(true);
-        primaryStage.show();
+
+        Platform.runLater(() -> {
+            primaryStage.setMaximized(false);
+            primaryStage.setMaximized(true);
+        });
+        // primaryStage.setMaximized(true);
+        // primaryStage.show();
     }
 
 
@@ -221,7 +262,7 @@ public class MainGame {
                 shelterName = "Pawsville Animal Shelter";
             }
             titleText.setText(shelterName);
-            saveShelterName(shelterName);
+            saveGameData(shelterName, dayCount);
             dialogStage.close();
         });
 
@@ -239,9 +280,27 @@ public class MainGame {
         dialogStage.showAndWait();
     }
 
-    private void saveShelterName(String shelterName) {
-        try (FileOutputStream outputStream = new FileOutputStream("CritterCareSave.txt")) {
-            outputStream.write(shelterName.getBytes());
+    private int loadGameData() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("CritterCareSave.txt"))) {
+            String shelterName = reader.readLine(); // Read the first line (shelter name)
+            String dayCountStr = reader.readLine(); // Read the second line (day count)
+
+            if (dayCountStr != null) {
+                return Integer.parseInt(dayCountStr);
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return 1; // Default to day 1 if there's an error
+    }
+
+
+    void saveGameData(String shelterName, int dayCount) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("CritterCareSave.txt"))) {
+            writer.write(shelterName); // First line: Shelter name
+            writer.newLine();
+            writer.write(String.valueOf(dayCount)); // Second line: Day count
+            writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -393,19 +452,10 @@ public class MainGame {
 
     public void resetGameData() {
         File file = new File("AcceptedAnimals.txt");
-        File file2 = new File("CritterCareSave.txt");
 
         // Delete file1 if it exists
         if (file.exists()) {
             if (file.delete()) {
-                System.out.println("Game reset: AcceptedAnimals.txt deleted.");
-            } else {
-                System.err.println("Failed to delete AcceptedAnimals.txt.");
-            }
-        }
-        // Delete file2 if it exists
-        if (file2.exists()) {
-            if (file2.delete()) {
                 System.out.println("Game reset: AcceptedAnimals.txt deleted.");
             } else {
                 System.err.println("Failed to delete AcceptedAnimals.txt.");
@@ -428,27 +478,27 @@ public class MainGame {
     }
 
     public void removeDuplicatesAndSave() {
-        // Step 1: Read the file and store the animals
-        Set<String> animalEntries = new HashSet<>();  // To track unique animal entries (exact match)
-        List<String> uniqueAnimals = new ArrayList<>();
+        Map<String, String> uniqueAnimals = new LinkedHashMap<>(); // Preserve order while ensuring uniqueness
 
         try (BufferedReader reader = new BufferedReader(new FileReader("acceptedAnimals.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // Step 2: Check if the exact animal entry already exists
-                if (!animalEntries.contains(line)) {
-                    animalEntries.add(line);  // Add the entire line to the set to track uniqueness
-                    uniqueAnimals.add(line);  // Add the entire line (animal info) to the unique list
+                String[] parts = line.split(",");  // Split CSV fields
+                if (parts.length >= 5) { // Ensure we have enough fields to uniquely identify
+                    String key = String.join(",", parts[0], parts[1], parts[2], parts[3]); // Name, Type, Image, Age
+
+                    // Store only the most complete version of the entry
+                    uniqueAnimals.put(key, line);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Step 3: Write the unique animals back to the file
+        // Write back only unique entries
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("acceptedAnimals.txt"))) {
-            for (String uniqueAnimal : uniqueAnimals) {
-                writer.write(uniqueAnimal);
+            for (String fullEntry : uniqueAnimals.values()) {
+                writer.write(fullEntry);
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -476,4 +526,11 @@ public class MainGame {
         }
     }
 
+    public String getShelterName() {
+        return shelterName;
+    }
+
+    public int getDayCount() {
+        return dayCount;
+    }
 }

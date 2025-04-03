@@ -18,6 +18,10 @@
     -fx-background-radius: 10px;
 }
 
+.day-end-window {
+    -fx-background-color: lightblue;
+}
+
 /* Set background color */
 .root {
     -fx-background-color: lightblue;
@@ -309,6 +313,22 @@
 }
 
 .small-menu-button:hover {
+    -fx-background-color: #E76F51;
+}
+
+.back-button {
+    -fx-font-size: 14px;
+    -fx-padding: 5px 10px;
+    -fx-border-width: 2px;
+    -fx-background-color: #F4A261;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-color: black;
+}
+
+.back-button:hover {
+    -fx-font-size: 14px; /* Ensure font size remains the same */
+    -fx-padding: 5px 10px;
     -fx-background-color: #E76F51;
 }
 

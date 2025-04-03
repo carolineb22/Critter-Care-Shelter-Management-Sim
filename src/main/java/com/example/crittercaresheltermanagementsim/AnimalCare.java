@@ -1,5 +1,6 @@
 package com.example.crittercaresheltermanagementsim;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -15,6 +16,7 @@ import javafx.stage.Stage;
 import java.io.*;
 
 public class AnimalCare {
+
     public static Scene createAnimalDetailsScene(Stage primaryStage, Scene previousScene, Animal animal) {
         BorderPane root = new BorderPane();
         root.getStyleClass().add("background");
@@ -29,7 +31,13 @@ public class AnimalCare {
         Button backButton = new Button("← Menu");
         backButton.setFont(Font.font("Comic Sans MS", 14));
         backButton.getStyleClass().add("back-button");
-        backButton.setOnAction(e -> primaryStage.setScene(previousScene));
+        backButton.setOnAction(e -> {
+            primaryStage.setScene(previousScene);
+            Platform.runLater(() -> {
+                primaryStage.setMaximized(false);
+                primaryStage.setMaximized(true);
+            });
+        });
 
         topBar.getChildren().addAll(backButton);
         root.setTop(topBar);
