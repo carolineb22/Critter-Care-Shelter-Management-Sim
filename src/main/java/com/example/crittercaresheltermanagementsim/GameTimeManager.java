@@ -14,12 +14,17 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.*;
+
+import static com.example.crittercaresheltermanagementsim.AnimalCare.updateAnimalStatusInFile;
+
 public class GameTimeManager {
     private int hour = 6; // Start at 6:00 AM
     private int minute = 0;
     private boolean isPaused = false;
     private int currentDay;
     private MainGame mainGame;  // Ensure this is always initialized
+    Animal animal;
 
     private Label timeLabel;
     private Timeline timeline;
@@ -48,7 +53,7 @@ public class GameTimeManager {
 
             updateTimeLabel();
 
-            if (hour == 7) { // 9:00 PM triggers end-of-day event
+            if (hour == 9) { // 9:00 PM triggers end-of-day event
                 timeline.pause();
                 if (mainGame != null) {
                     showEndOfDayPopup(mainGame.getShelterName());
@@ -92,6 +97,13 @@ public class GameTimeManager {
             currentDay++; // Increment the day count
             if (mainGame != null) {
                 mainGame.saveGameData(shelterName, currentDay); // Save updated day count
+                resetFedStatusForNewDay();
+                if (this.animal != null) {
+                    this.animal.resetDailyFlags();
+//                    dayLabel.setText("Day: " + currentDay);
+                } else {
+                    System.out.println("Animal object is null.");
+                }
             } else {
                 System.out.println("ERROR: mainGame is null! Cannot save data.");
             }
@@ -160,4 +172,32 @@ public class GameTimeManager {
 
         return timeBox;
     }
+
+    private static void resetFedStatusForNewDay() {
+        File file = new File("AcceptedAnimals.txt");
+        StringBuilder updatedContent = new StringBuilder();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 14) {
+                    // Reset fedStatus to false at the start of the new day
+//                    parts[8] = "false"; // Assuming the 9th element is fedStatus (index 8)
+                    line = line.replace(parts[8], "false");
+                }
+                updatedContent.append(String.join(",", parts)).append("\n");
+            }
+
+            // Write updated data back to the file
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                writer.write(updatedContent.toString());
+                System.out.println("All animals' fedStatus reset for the new day.");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

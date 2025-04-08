@@ -46,6 +46,11 @@ public class MainGame {
         gridPane.setVgap(15);
         gridPane.setAlignment(Pos.CENTER);
 
+        System.out.println("=== Debug: Animal List ===");
+        for (int i = 0; i < acceptedAnimals.size(); i++) {
+            System.out.println(i + ": " + acceptedAnimals.get(i).getName());
+        }
+
         // Define column and row constraints
         for (int i = 0; i < 7; i++) {
             ColumnConstraints column = new ColumnConstraints();
@@ -195,6 +200,7 @@ public class MainGame {
                     }
                     Scene animalDetailsScene = AnimalCare.createAnimalDetailsScene(primaryStage, primaryStage.getScene(), selectedAnimal);
                     primaryStage.setScene(animalDetailsScene);
+                    loadAcceptedAnimals();
                     Platform.runLater(() -> {
                         primaryStage.setMaximized(false);
                         primaryStage.setMaximized(true);
@@ -204,10 +210,6 @@ public class MainGame {
                 buttonCount++; // Increment button count
             }
         }
-
-
-
-        loadAcceptedAnimals();
 
         this.mainGameScene = scene;  // Store scene reference
         // Set scene properties
@@ -321,14 +323,16 @@ public class MainGame {
 
     // Save accepted animals to a file with stats
     private void saveAcceptedAnimals() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("AcceptedAnimals.txt", true))) { // 'true' enables append mode
-            // Loop through accepted animals and write each one on a new line
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("AcceptedAnimals.txt", true))) {
             for (Map.Entry<String, Animal> entry : acceptedAnimals.entrySet()) {
                 Animal animal = entry.getValue();
                 String line = animal.getName() + "," + animal.getType() + "," + animal.getImageFile() + "," +
-                        animal.getHappiness() + "," + animal.getAppearance() + "," + animal.getObedience() + "," + animal.getAdoptability() + "," + animal.getAge();
+                        animal.getHappiness() + "," + animal.getAppearance() + "," + animal.getObedience() + "," +
+                        animal.getAdoptability() + "," + animal.getAge() + "," +
+                        animal.isFedStatus() + "," + animal.isVaccinatedStatus() + "," + animal.getHealthStatus() + "," +
+                        animal.getPlayStatus() + "," + animal.getGroomStatus() + "," + animal.getTrainingStatus();
                 writer.write(line);
-                writer.newLine(); // Ensure each animal's data is written on a new line
+                writer.newLine();
             }
         } catch (IOException e) {
             System.err.println("Error saving accepted animals: " + e.getMessage());

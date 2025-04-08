@@ -1,12 +1,10 @@
-Sampson,Bunny,bunny1.png,2,3,2,2,6 years, false,false,Terrible,Good,Average,Great
-Archie,Cat,cat1.png,1,1,4,2,4 months, false,false,Terrible,Good,Average,Great
-Cookie,Dog,dog2.png,1,2,1,1,1 months, false,false,Terrible,Good,Average,Great
-Mocha,Cat,cat3.png,2,2,3,2,4 months, false,false,Terrible,Good,Average,Great
-Cleo,Dog,dog1.png,2,1,3,2,8 months, false,false,Terrible,Good,Average,Great
-Mabel,Cat,cat1.png,3,3,1,2,6 months,false,false,Terrible,Good,Average,Great
-Raspberry,Bunny,bunny1.png,2,3,3,2,5 months, false,false,Terrible,Good,Average,Great
-Elsa,Dog,dog1.png,2,1,5,2,2 months,false,false,Terrible,Good,Average,Great
-Duke,Cat,cat1.png,1,2,3,2,1 years,false,false,Poor,Poor,Great,Average
-Jasper,Cat,cat1.png,2,2,2,2,3 years,false,false,Average,Poor,Average,Poor
-Lily,Bunny,bunny1.png,3,3,3,3,7 years,false,false,Good,Good,Great,Average
-Trixie,Dog,dog1.png,2,2,4,2,4 years,false,false,Poor,Average,Average,Good
+Rufus,Dog,dog1.png,2,1,3,2,10 years,false,false,Terrible,Good,Terrible,Average
+Teddy,Cat,cat2.png,2,2,1,1,10 years,false,false,Terrible,Good,Good,Terrible
+Riley,Dog,dog2.png,2,3,3,2,8 months,false,false,Good,Average,Good,Average
+Mocha,Bunny,bunny2.png,2,3,2,2,2 years,true,true,Great,Average,Great,Average
+Oscar,Bunny,bunny3.png,2,3,3,2,5 months,true,true,Great,Average,Great,Average
+Coco,Dog,dog2.png,2,1,5,2,3 years,true,true,Great,Great,Great,Great
+Peanut,Bunny,bunny2.png,2,2,4,2,2 years,true,true,Poor,Great,Great,Great
+Lily,Cat,cat1.png,2,2,2,2,8 years,false,false,Great,Terrible,Poor,Poor
+Finn,Cat,cat1.png,1,1,4,2,10 months,true,true,Average,Great,Average,Great
+Maggie,Dog,dog1.png,3,2,5,3,8 months,false,false,Great,Good,Poor,Great

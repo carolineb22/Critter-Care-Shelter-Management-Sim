@@ -59,7 +59,10 @@ public class MainMenu extends Application {
         newGameButton.getStyleClass().add("menu-button");
 
         // Button Actions
-        continueButton.setOnAction(e -> checkForSaveFiles());
+        continueButton.setOnAction(e -> {
+            checkForSaveFiles();
+            mainGame.loadAcceptedAnimals();
+        });
         newGameButton.setOnAction(e -> newGameWarning());
 
         VBox menuLayout = new VBox(10, title, subtitle, continueButton, newGameButton);

@@ -18,6 +18,10 @@ import java.io.*;
 public class AnimalCare {
 
     public static Scene createAnimalDetailsScene(Stage primaryStage, Scene previousScene, Animal animal) {
+        if (animal == null) {
+            System.out.println("Tried to open details for a null animal.");
+            return previousScene;
+        }
         BorderPane root = new BorderPane();
         root.getStyleClass().add("background");
         root.setPadding(new Insets(10));
@@ -132,12 +136,12 @@ public class AnimalCare {
 
         // Add action boxes
         actionsBox.getChildren().addAll(
-                createStatusActionRow("Status: Good", "FEED"),
-                createStatusActionRow("Status: False", "VACCINATE"),
-                createStatusActionRow("Status: Poor", "VET"),
-                createStatusActionRow("Status: Terrible", "PLAY"),
-                createStatusActionRow("Status: Great", "GROOM"),
-                createStatusActionRow("Status: In training", "TRAIN")
+                createStatusActionRow("Status: " + (animal.isFedStatus() ? "Fed" : "Unfed"), "FEED", animal),
+                createStatusActionRow("Status: " + (animal.isVaccinatedStatus() ? "Vaccinated" : "Not vaccinated"), "VACCINATE", animal),
+                createStatusActionRow("Status: " + animal.getHealthStatus(), "VET", animal),
+                createStatusActionRow("Status: " + animal.getPlayStatus(), "PLAY", animal),
+                createStatusActionRow("Status: " + animal.getGroomStatus(), "GROOM", animal),
+                createStatusActionRow("Status: " + animal.getTrainingStatus(), "TRAIN", animal)
         );
 
         rightBox.getChildren().addAll(descLabel, descBox, actionsBox);
@@ -149,7 +153,7 @@ public class AnimalCare {
         return scene;
     }
 
-    private static HBox createStatusActionRow(String status, String action) {
+    private static HBox createStatusActionRow(String status, String action, Animal animal) {
         HBox row = new HBox(10);
         row.setAlignment(Pos.CENTER);
         row.setPadding(new Insets(5));
@@ -157,11 +161,152 @@ public class AnimalCare {
 
         Label statusLabel = new Label(status);
         statusLabel.getStyleClass().add("status-label");
+
         Button actionButton = new Button(action);
         actionButton.getStyleClass().add("action-button");
 
+        actionButton.setOnAction(e -> handleActionButtonClick(animal, action, actionButton, statusLabel));  // Corrected here
+
         row.getChildren().addAll(statusLabel, actionButton);
         return row;
+    }
+
+
+    private static void handleActionButtonClick(Animal animal, String actionType, Button actionButton, Label statusLabel) {
+        boolean updated = false;
+
+        switch (actionType.toLowerCase()) {
+            case "feed":
+                if (!animal.hasFedToday()) {  // Checks if animal hasn't been fed today
+                    animal.setFedStatus(true);  // Marks the animal as fed
+                    animal.setHasFedToday(true); // Sets the daily flag to true
+                    updated = true;
+                }
+                break;
+
+            case "vaccinate":
+                if (!animal.isVaccinatedStatus()) {  // Checks if the animal is not vaccinated
+                    animal.setVaccinatedStatus(true);  // Marks the animal as vaccinated
+                    updated = true;
+                }
+                break;
+
+            case "vet":
+                if (!animal.hasVisitedVetToday()) {  // Checks if animal hasn't visited vet today
+                    animal.setHealthStatus(increaseStatusLevel(animal.getHealthStatus()));  // Increases health status
+                    animal.setHasVisitedVetToday(true);  // Marks vet visit flag
+                    updated = true;
+                }
+                break;
+
+            case "play":
+                if (!animal.hasPlayedToday()) {  // Checks if animal hasn't played today
+                    animal.setPlayStatus(increaseStatusLevel(animal.getPlayStatus()));  // Increases play status
+                    animal.setHasPlayedToday(true);  // Marks play flag
+                    updated = true;
+                }
+                break;
+
+            case "groom":
+                if (!animal.hasBeenGroomedToday()) {  // Checks if animal hasn't been groomed today
+                    animal.setGroomStatus(increaseStatusLevel(animal.getGroomStatus()));  // Increases grooming status
+                    animal.setHasBeenGroomedToday(true);  // Marks grooming flag
+                    updated = true;
+                }
+                break;
+
+            case "train":
+                if (!animal.hasTrainedToday()) {  // Checks if animal hasn't trained today
+                    animal.setTrainingStatus(increaseStatusLevel(animal.getTrainingStatus()));  // Increases training status
+                    animal.setHasTrainedToday(true);  // Marks training flag
+                    updated = true;
+                }
+                break;
+        }
+
+        // Save updated animal status to file
+        if (updated) {
+            updateAnimalStatusInFile(animal);
+
+            // Update the button text to "DONE"
+            Platform.runLater(() -> actionButton.setText("DONE"));
+
+            // Update the status label text based on the animal's status
+            Platform.runLater(() -> {
+                String newStatus = getStatusLabelText(actionType, animal);
+                statusLabel.setText("Status: " + newStatus);
+            });
+        }
+    }
+
+    private static String getStatusLabelText(String actionType, Animal animal) {
+        switch (actionType.toLowerCase()) {
+            case "feed":
+                return animal.isFedStatus() ? "Fed" : "Not Fed";
+            case "vaccinate":
+                return animal.isVaccinatedStatus() ? "Vaccinated" : "Not Vaccinated";
+            case "vet":
+                return animal.getHealthStatus();
+            case "play":
+                return animal.getPlayStatus();
+            case "groom":
+                return animal.getGroomStatus();
+            case "train":
+                return animal.getTrainingStatus();
+            default:
+                return "Unknown";
+        }
+    }
+
+    // Method to increase the status level
+    private static String increaseStatusLevel(String currentStatus) {
+        switch (currentStatus) {
+            case "Terrible":
+                return "Poor";
+            case "Poor":
+                return "Average";
+            case "Average":
+                return "Good";
+            case "Good":
+                return "Great";
+            default:
+                return currentStatus; // If the status is already Great, it stays Great
+        }
+    }
+
+
+    static void updateAnimalStatusInFile(Animal animal) {
+        File file = new File("AcceptedAnimals.txt");
+        if (!file.exists()) return;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            StringBuilder fileContent = new StringBuilder();
+            String line;
+
+            // Read the file and update the line corresponding to the animal
+            while ((line = br.readLine()) != null) {
+                String[] animalData = line.split(",");
+                if (animalData[0].equals(animal.getName())) {
+                    // Update only the specific status that has changed
+                    animalData[8] = String.valueOf(animal.isFedStatus()); // Update the fedStatus
+                    animalData[9] = String.valueOf(animal.isVaccinatedStatus()); // Update vaccinatedStatus
+                    animalData[10] = String.valueOf(animal.getHealthStatus()); // Update HealthStatus
+                    animalData[11] = String.valueOf(animal.getPlayStatus());
+                    animalData[12] = String.valueOf(animal.getGroomStatus());
+                    animalData[13] = String.valueOf(animal.getTrainingStatus());
+                    line = String.join(",", animalData); // Rebuild the line with updated status
+                }
+                fileContent.append(line).append("\n");
+            }
+
+            // Write the modified content back to the file
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+                bw.write(fileContent.toString());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static Label createStatLabel(String text) {
@@ -306,6 +451,7 @@ public class AnimalCare {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
 }

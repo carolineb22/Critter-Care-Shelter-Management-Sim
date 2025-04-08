@@ -15,6 +15,18 @@ class Animal {
     String playStatus;
     String groomStatus;
     String trainingStatus;
+    private boolean hasFedToday;
+    private boolean hasVisitedVetToday;
+    private boolean hasPlayedToday;
+    private boolean hasBeenGroomedToday;
+    private boolean hasTrainedToday;
+    private int lastFedDay;
+    private int lastVetDay;
+    private int lastPlayDay;
+    private int lastGroomDay;
+    private int lastTrainDay;
+
+
 
     // Updated Constructor
     public Animal(String name, String type, String imageFile, int happiness, int appearance, int obedience, int adoptability,
@@ -106,4 +118,69 @@ class Animal {
 
 
     public void setName(String name) { this.name = name; }
+
+    public void setPlayStatus(String playStatus) { this.playStatus = playStatus; }
+
+    public void setGroomStatus(String groomStatus) { this.groomStatus = groomStatus; }
+
+    public void setTrainingStatus(String trainingStatus) { this.trainingStatus = trainingStatus; }
+
+
+    public void setHealthStatus(String healthStatus) { this.healthStatus = healthStatus; }
+
+
+    public void setVaccinatedStatus(boolean vaccinatedStatus) { this.vaccinatedStatus = vaccinatedStatus; }
+
+
+    public void setFedStatus(boolean fedStatus) { this.fedStatus = fedStatus;}
+
+    // Fed flag
+    public boolean hasFedToday() {
+        return hasFedToday;
+    }
+    public void setHasFedToday(boolean hasFedToday) {
+        this.hasFedToday = hasFedToday;
+    }
+
+    // Vet visit flag
+    public boolean hasVisitedVetToday() {
+        return hasVisitedVetToday;
+    }
+    public void setHasVisitedVetToday(boolean hasVisitedVetToday) {
+        this.hasVisitedVetToday = hasVisitedVetToday;
+    }
+
+    // Play flag
+    public boolean hasPlayedToday() {
+        return hasPlayedToday;
+    }
+    public void setHasPlayedToday(boolean hasPlayedToday) {
+        this.hasPlayedToday = hasPlayedToday;
+    }
+
+    // Groom flag
+    public boolean hasBeenGroomedToday() {
+        return hasBeenGroomedToday;
+    }
+    public void setHasBeenGroomedToday(boolean hasBeenGroomedToday) {
+        this.hasBeenGroomedToday = hasBeenGroomedToday;
+    }
+
+    // Train flag
+    public boolean hasTrainedToday() {
+        return hasTrainedToday;
+    }
+    public void setHasTrainedToday(boolean hasTrainedToday) {
+        this.hasTrainedToday = hasTrainedToday;
+    }
+
+    // Reset the flags at the start of a new day
+    public void resetDailyFlags() {
+        this.hasFedToday = false;
+        this.hasVisitedVetToday = false;
+        this.hasPlayedToday = false;
+        this.hasBeenGroomedToday = false;
+        this.hasTrainedToday = false;
+    }
+
 }
